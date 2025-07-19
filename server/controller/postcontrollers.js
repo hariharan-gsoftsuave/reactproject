@@ -172,6 +172,7 @@ const likeDislikePost = async(req, res,next)=>{
 const getUserPosts = async(req, res,next)=>{ 
     try{
         const userid = req.user.id;
+        console.log(userid);
         const posts = await UserModel.findById(userid).populate({path:"post",options:{sort:{createdAt:-1}}})
         res.json(posts).status(200);
     }catch(error){
@@ -180,11 +181,22 @@ const getUserPosts = async(req, res,next)=>{
 };
 
 //============================ ***** Create bookmark ***** ====================
-// post : api/post/:id/bookmark
+// post : api/posts/:id/bookmarks
 //PROTECTED
 const createBookmark = async(req, res,next)=>{ 
     try{
-        res.json('Create bookmark');
+        const {id} = req.params;
+        
+        const user = await UserModel.findById(req.user.id);
+        //check if the post is already bookmarked
+        if(user?.bookmarks.includes(id)){
+            const getUserBookmarks = await UserModel.findByIdAndUpdate( req.user.id,{$pull:{bookmarks:id}},{new:true});
+            res.json(getUserBookmarks).status(200);
+        }else{
+            const getUserBookmarks = await UserModel.findByIdAndUpdate( req.user.id,{$push:{bookmarks:id}},{new:true});
+            res.json(getUserBookmarks).status(200);
+        }
+       
     }catch(error){
         return next(new HttpError(error))
     }
@@ -195,7 +207,9 @@ const createBookmark = async(req, res,next)=>{
 //PROTECTED
 const getUserBookmarks = async(req, res,next)=>{ 
     try{
-        res.json('Get BOOKMARKS');
+        const userBookMarks= await UserModel.findById(req.user.id).populate({path:"bookmarks",options:{sort:{createdAt:-1}}});
+        res.json(userBookMarks).status(200);
+        // If you want to return just the bookmarks without the user details, you can do:
     }catch(error){
         return next(new HttpError(error))
     }

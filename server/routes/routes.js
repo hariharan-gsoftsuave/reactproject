@@ -2,6 +2,7 @@ const router = require("express").Router()
 
 const {registerUser,loginUser,getUser,getUsers,editUser,followUnfollowUser,changeUserAvatar} = require('../controller/userControllers');
 const {createPost,getPost,getPosts,updatePost,deletePost,getUserPosts,likeDislikePost,getfollowing,getUserBookmarks,createBookmark} =require('../controller/postcontrollers');
+const {createComment,getPostComment,deleteComment} = require('../controller/commentcontrollers');
 const authMiddelware = require("../middleware/authMiddleware");
 
 //USER ROUTER
@@ -25,6 +26,10 @@ router.get('/posts',authMiddelware,getPosts)
 router.get('/posts/following',authMiddelware,getfollowing)
 router.get('/posts/:id/bookmarks',authMiddelware,createBookmark)
 
+//COMMENT ROUTEs
+router.post('/comment/:postid',authMiddelware,createComment)
+router.get('/comment/:postid',authMiddelware,getPostComment)    
+router.delete('/comment/:postid',authMiddelware,deleteComment)
 module.exports = router;
 
 
